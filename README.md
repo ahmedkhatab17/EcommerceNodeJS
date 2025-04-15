@@ -1,147 +1,116 @@
-شرح الباكجات:
-express → لإنشاء السيرفر.
 
+# 🛒 Ecommerce Node.js API
 
-mongoose → للتعامل مع MongoDB.
+A full-featured e-commerce REST API built using **Node.js**, **Express**, and **MongoDB**, supporting user authentication, product management, and order handling with role-based access control.
 
-dotenv → لإدارة المتغيرات البيئية.
+---
 
-bcryptjs → لتشفير كلمات المرور.
+## 📦 Packages Used
 
-jsonwebtoken → لإنشاء الـ JWT authentication.
+| Package         | Purpose                                                  |
+|----------------|----------------------------------------------------------|
+| **express**     | Web framework to create the server                      |
+| **mongoose**    | ODM for interacting with MongoDB                        |
+| **dotenv**      | Manage environment variables                            |
+| **bcryptjs**    | Hash passwords before storing                           |
+| **jsonwebtoken**| Handle JWT-based authentication                         |
+| **cors**        | Allow cross-origin API requests                         |
+| **multer**      | Handle file uploads (e.g., images)                      |
+| **aws-sdk**     | Connect with Amazon S3                                  |
+| **multer-s3**   | Upload files directly to S3                             |
+| **nodemon**     | Auto-restart server during development                  |
 
-cors → للسماح بطلبات الـ API من أي دومين.
+---
 
-multer, multer-s3, aws-sdk → لرفع الملفات والصور.
+## 📁 Project Structure
 
-nodemon → لإعادة تشغيل السيرفر تلقائيًا أثناء التطوير.
-
-////////////////////////////////////////
-
-ecommerce
+```
+ecommerce/
 │
-├── models/              # نماذج MongoDB
-│   ├── User.js
-│   ├── Product.js
-│   ├── Order.js
-│   └── Category.js
-|      └── User.js
+├── config/              # MongoDB configuration
+│   └── db.js
 │
-├── controllers/         # المنطق الخاص بـ APIs
+├── controllers/         # API logic
 │   ├── authController.js
 │   ├── productController.js
 │   ├── orderController.js
-│   └── categoryController.js
-|      └── productController.js
-|      └── cartController.js
-
+│   ├── categoryController.js
+│   └── cartController.js
 │
-├── routes/              # Routes
+├── routes/              # Route handlers
 │   ├── authRoutes.js
 │   ├── productRoutes.js
 │   ├── orderRoutes.js
-│   └── categoryRoutes.js
-|      └── productRoutes.js
-|      └── cartRoutes.js
-
-
+│   ├── categoryRoutes.js
+│   └── cartRoutes.js
 │
-├── middleware/          # Middleware
+├── models/              # Mongoose schemas
+│   ├── User.js
+│   ├── Product.js
+│   ├── Order.js
+│   ├── Category.js
+│   └── Cart.js
+│
+├── middleware/          # Middleware (e.g., Auth)
 │   └── authMiddleware.js
 │
-├── config/              # إعدادات MongoDB
-│   └── db.js
-│
-├── .env                 # ملف البيئة
-├── server.js            # ملف بدء التشغيل
-└── package.json
+├── .env                 # Environment variables
+├── server.js            # Entry point
+├── package.json         # NPM dependencies
+└── README.md
+```
 
+---
 
+## 🧠 User Roles
 
+After logging in, the response includes the user’s role. This allows frontend apps to control access:
 
+- **User**: Can view and order products
+- **Admin**: Can manage products, categories, and orders (add/edit/delete)
 
-✅ النتيجة النهائية
-الآن عند تسجيل الدخول، سيرجع الدور (role) مع بيانات المستخدم، مما يسمح لك بالتحكم في الصلاحيات:
-✔️ المستخدم العادي (user): يستطيع شراء المنتجات فقط
-✔️ الأدمن (admin): يستطيع 
-إضافة، تعديل، وحذف الفئات، المنتجات، والطلبات
+---
 
+## 🧱 Database Design
 
+This project uses **MongoDB** with four main collections:
 
+### 1️⃣ `users`
+Stores user account information.
 
-
-📌 تصميم قاعدة البيانات لمشروع E-commerce باستخدام MongoDB
-بما إنك بتستخدم MongoDB، هتحتاج تعمل Collections بدل الجداول (لأن MongoDB NoSQL).
-
-📂 هيكلة قاعدة البيانات
-📌 هتكون عندك 4 Collections رئيسية:
-1️⃣ users → تخزين بيانات المستخدمين
-2️⃣ products → تخزين المنتجات
-3️⃣ categories → تصنيف المنتجات
-4️⃣ orders → تخزين الطلبات
-
-
-
-
-
-📌 تصميم الجداول (Collections)
-1️⃣ Collection: users (المستخدمين)
-📌 لتخزين بيانات المستخدمين، هيكون عندك:
-
-username: اسم المستخدم
-email: البريد الإلكتروني (فريد unique)
-password: كلمة المرور (بعد التشفير)
-role: دور المستخدم (admin أو user)
-createdAt: 
-تاريخ التسجيل
-
-
-ex======================
+```json
 {
   "username": "ahmed123",
   "email": "ahmed@example.com",
-  "password": "sddsdsdsd",
-  "role": "user",
+  "password": "hashed_password",
+  "role": "user",  // or "admin"
+  "createdAt": "2024-02-02T12:00:00Z"
 }
+```
 
+---
 
+### 2️⃣ `categories`
+Stores product categories.
 
-
-
-2️⃣ Collection: categories (التصنيفات)
-📌 كل منتج بينتمي إلى تصنيف معين مثل "هواتف"، "ملابس"، فهنخزن:
-
-name: اسم التصنيف
-createdAt: وقت الإضافة
-📍 الشكل النهائي في MongoDB:
-
-
+```json
 {
   "name": "Electronics",
-  "description":"dsdsds"
+  "description": "All electronic items",
+  "createdAt": "2024-02-02T12:05:00Z"
 }
+```
 
+---
 
+### 3️⃣ `products`
+Stores product details.
 
-
-3️⃣ Collection: products (المنتجات)
-📌 كل منتج بيكون له:
-
-name: اسم المنتج
-price: السعر
-category: معرف التصنيف (category_id)
-stock: الكمية المتاحة
-description: وصف المنتج
-images: صور المنتج
-createdAt: 
-وقت الإضافة
-
-
+```json
 {
-  "_id": "650ab5f2e23a5a7a4c8b4569",
   "name": "iPhone 15",
   "price": 1200,
-  "category": "650ab4e7e23a5a7a4c8b4568",
+  "category": "ObjectId of category",
   "stock": 50,
   "description": "New iPhone with A16 Bionic chip.",
   "images": [
@@ -150,104 +119,72 @@ createdAt:
   ],
   "createdAt": "2024-02-02T12:10:00Z"
 }
+```
 
+---
 
+### 4️⃣ `orders`
+Stores order details.
 
-
-
-
-
-
-
-
-
-4️⃣ Collection: orders (الطلبات)
-📌 كل طلب بيكون مرتبط بـ مستخدم معين (user_id) ومنتجات (product_id) وكمان هيكون عندك:
-
-user: معرف المستخدم اللي طلب المنتجات
-products: قائمة بالمنتجات المطلوبة وعددها
-totalPrice: إجمالي السعر
-status: حالة الطلب (Pending, Shipped, Delivered)
-createdAt: تاريخ الطلب
-
-
-
+```json
 {
-  "_id": "650ab6e4e23a5a7a4c8b4570",
-  "user": "650ab3f0e23a5a7a4c8b4567",
+  "user": "ObjectId of user",
   "products": [
     {
-      "product": "650ab5f2e23a5a7a4c8b4569",
+      "product": "ObjectId of product",
       "quantity": 2
     }
   ],
   "totalPrice": 2400,
-  "status": "Pending",
+  "status": "Pending",  // or "Shipped", "Delivered"
   "createdAt": "2024-02-02T12:20:00Z"
 }
+```
 
+---
 
+## 🔗 Relationships Between Collections
 
+- Each **Product** belongs to a **Category**
+- Each **Order** belongs to a **User**
+- Each **Order** contains multiple **Products**
 
+---
 
-📌 العلاقات بين الـ Collections
-📍 العلاقات بتكون كالتالي:
+## 📥 Sample MongoDB Inserts
 
-كل Product بينتمي إلى Category (category_id).
-كل Order مرتبط بـ User (user_id).
-كل Order يحتوي على منتجات متعددة (product_id مع quantity).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```js
 db.users.insertOne({
-  "username": "ahmed123",
-  "email": "ahmed@example.com",
-  "password": "$2a$10$encryptedpassword",
-  "role": "user",
-  "createdAt": new Date()
-})
+  username: "ahmed123",
+  email: "ahmed@example.com",
+  password: "$2a$10$encryptedpassword",
+  role: "user",
+  createdAt: new Date()
+});
 
 db.categories.insertOne({
-  "name": "Electronics",
-  "createdAt": new Date()
-})
+  name: "Electronics",
+  createdAt: new Date()
+});
 
 db.products.insertOne({
-  "name": "iPhone 15",
-  "price": 1200,
-  "category": ObjectId("650ab4e7e23a5a7a4c8b4568"),
-  "stock": 50,
-  "description": "New iPhone with A16 Bionic chip.",
-  "images": ["https://example.com/iphone1.jpg"],
-  "createdAt": new Date()
-})
+  name: "iPhone 15",
+  price: 1200,
+  category: ObjectId("..."),
+  stock: 50,
+  description: "New iPhone with A16 Bionic chip.",
+  images: ["https://example.com/iphone1.jpg"],
+  createdAt: new Date()
+});
 
 db.orders.insertOne({
-  "user": ObjectId("650ab3f0e23a5a7a4c8b4567"),
-  "products": [
-    { "product": ObjectId("650ab5f2e23a5a7a4c8b4569"), "quantity": 2 }
+  user: ObjectId("..."),
+  products: [
+    { product: ObjectId("..."), quantity: 2 }
   ],
-  "totalPrice": 2400,
-  "status": "Pending",
-  "createdAt": new Date()
-})
+  totalPrice: 2400,
+  status: "Pending",
+  createdAt: new Date()
+});
+```
 
-
-# EcommerceNodeJS
