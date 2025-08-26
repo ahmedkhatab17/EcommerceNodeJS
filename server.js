@@ -16,12 +16,12 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'E-commerce API is running! 🚀',
     endpoints: {
-      products: '/api/products',
-      categories: '/api/categories',
-      auth: '/api/auth',
-      cart: '/api/cart',
-      orders: '/api/orders',
-      health: '/api/health'
+      products: '/products',
+      categories: '/categories',
+      auth: '/auth',
+      cart: '/cart',
+      orders: '/orders',
+      health: '/health'
     }
   });
 });
@@ -32,13 +32,13 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
+app.use('/categories', categoryRoutes);
+app.use('/cart', cartRoutes);
+app.use('/orders', orderRoutes);
 
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
