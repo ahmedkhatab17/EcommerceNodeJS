@@ -1,14 +1,11 @@
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 
-// Create an order
 exports.createOrder = async (req, res) => {
   try {
-    const {  products } = req.body;
-    let totalAmount = 0; // لاحتساب التوتال
-
-
-    for (let item of products) {
+    const { items, shippingAddress, paymentMethod, totalAmount } = req.body;
+    
+    for (let item of items) {
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
@@ -16,23 +13,21 @@ exports.createOrder = async (req, res) => {
 
       if (product.stock < item.quantity) {
         return res.status(400).json({ error: `Not enough stock for ${product.title}` });
-
       }
-      totalAmount += product.price * item.quantity; 
-
     }
 
-  
     const newOrder = new Order({
-      
-      products,
+      user: req.user.id,
+      products: items,
       totalAmount,
-      status: "pending"  
+      status: "pending",
+      shippingAddress,
+      paymentMethod
     });
 
-    for (let item of products) {
+    for (let item of items) {
       await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity } // تقليل الكمية من المخزون
+        $inc: { stock: -item.quantity }
       });
     }
 
@@ -53,16 +48,6 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    // إذا كانت الحالة هي "done"، نقوم بتحديث المخزون
-    if (status === "done") {
-      for (let item of order.products) {
-        await Product.findByIdAndUpdate(item.product, {
-          $inc: { stock: -item.quantity } // تقليل الكمية من المخزون
-        });
-      }
-    }
-
-    // تحديث حالة الطلب
     order.status = status;
     await order.save();
 
@@ -72,7 +57,6 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// Get all orders
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate('user').populate('products.product');
@@ -82,11 +66,35 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Get orders for a specific user
 exports.getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).populate('products.product');
+    const orders = await Order.find({ user: req.user.id })
+      .populate('user', 'name email role')
+      .populate('products.product')
+      .populate('products.product.category')
+      .sort({ createdAt: -1 });
     res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('user', '-password')
+      .populate('products.product')
+      .populate('products.product.category');
+    
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    
+    if (req.user.role !== 'admin' && order.user._id.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to view this order" });
+    }
+    
+    res.json(order);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,253 +1,251 @@
-شرح الباكجات:
-express → لإنشاء السيرفر.
+# E-commerce Backend API
 
+A complete RESTful API for an e-commerce platform built with Node.js, Express, and MongoDB.
 
-mongoose → للتعامل مع MongoDB.
+## Features
 
-dotenv → لإدارة المتغيرات البيئية.
+- 🔐 **Authentication & Authorization**
 
-bcryptjs → لتشفير كلمات المرور.
+  - User registration and login
+  - JWT-based authentication
+  - Role-based access control (User/Admin)
+  - Password reset functionality
 
-jsonwebtoken → لإنشاء الـ JWT authentication.
+- 🛍️ **Product Management**
 
-cors → للسماح بطلبات الـ API من أي دومين.
+  - CRUD operations for products
+  - Category management
+  - Product search and filtering
+  - Stock management
 
-multer, multer-s3, aws-sdk → لرفع الملفات والصور.
+- 🛒 **Shopping Cart**
 
-nodemon → لإعادة تشغيل السيرفر تلقائيًا أثناء التطوير.
+  - Add/remove products from cart
+  - Update quantities
+  - Cart persistence
+  - Stock validation
 
-////////////////////////////////////////
+- 📦 **Order Management**
 
-ecommerce
-│
-├── models/              # نماذج MongoDB
-│   ├── User.js
-│   ├── Product.js
-│   ├── Order.js
-│   └── Category.js
-|      └── User.js
-│
-├── controllers/         # المنطق الخاص بـ APIs
-│   ├── authController.js
-│   ├── productController.js
-│   ├── orderController.js
-│   └── categoryController.js
-|      └── productController.js
-|      └── cartController.js
+  - Create orders from cart
+  - Order status tracking
+  - Order history for users
+  - Admin order management
 
-│
-├── routes/              # Routes
-│   ├── authRoutes.js
-│   ├── productRoutes.js
-│   ├── orderRoutes.js
-│   └── categoryRoutes.js
-|      └── productRoutes.js
-|      └── cartRoutes.js
+- 🔍 **Advanced Features**
+  - Product search and filtering
+  - Price range filtering
+  - Category-based filtering
+  - Sorting options
 
+## Tech Stack
 
-│
-├── middleware/          # Middleware
-│   └── authMiddleware.js
-│
-├── config/              # إعدادات MongoDB
-│   └── db.js
-│
-├── .env                 # ملف البيئة
-├── server.js            # ملف بدء التشغيل
-└── package.json
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MongoDB with Mongoose ODM
+- **Authentication:** JWT (JSON Web Tokens)
+- **Password Hashing:** bcryptjs
+- **Email Service:** Nodemailer
+- **CORS:** Cross-Origin Resource Sharing enabled
 
+## Prerequisites
 
+- Node.js (v14 or higher)
+- MongoDB (local or cloud instance)
+- npm or yarn package manager
 
+## Installation
 
+1. **Clone the repository**
 
-✅ النتيجة النهائية
-الآن عند تسجيل الدخول، سيرجع الدور (role) مع بيانات المستخدم، مما يسمح لك بالتحكم في الصلاحيات:
-✔️ المستخدم العادي (user): يستطيع شراء المنتجات فقط
-✔️ الأدمن (admin): يستطيع 
-إضافة، تعديل، وحذف الفئات، المنتجات، والطلبات
+   ```bash
+   git clone <repository-url>
+   cd EcommerceNodeJS
+   ```
 
+2. **Install dependencies**
 
+   ```bash
+   npm install
+   ```
 
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
 
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb://localhost:27017/ecommerce
+   JWT_SECRET=your_jwt_secret_key_here_make_it_long_and_secure
+   EMAIL=your_email@gmail.com
+   PASSWORD=your_app_password_here
+   NODE_ENV=development
+   ```
 
-📌 تصميم قاعدة البيانات لمشروع E-commerce باستخدام MongoDB
-بما إنك بتستخدم MongoDB، هتحتاج تعمل Collections بدل الجداول (لأن MongoDB NoSQL).
+4. **Start the server**
 
-📂 هيكلة قاعدة البيانات
-📌 هتكون عندك 4 Collections رئيسية:
-1️⃣ users → تخزين بيانات المستخدمين
-2️⃣ products → تخزين المنتجات
-3️⃣ categories → تصنيف المنتجات
-4️⃣ orders → تخزين الطلبات
+   ```bash
+   # Development mode (with auto-reload)
+   npm run dev
 
+   # Production mode
+   npm start
+   ```
 
+## API Endpoints
 
+### Authentication
 
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/forgotpassword` - Request password reset
+- `PUT /api/auth/resetpassword/:token` - Reset password
 
-📌 تصميم الجداول (Collections)
-1️⃣ Collection: users (المستخدمين)
-📌 لتخزين بيانات المستخدمين، هيكون عندك:
+### Products
 
-username: اسم المستخدم
-email: البريد الإلكتروني (فريد unique)
-password: كلمة المرور (بعد التشفير)
-role: دور المستخدم (admin أو user)
-createdAt: 
-تاريخ التسجيل
+- `GET /api/products` - Get all products (with filtering)
+- `GET /api/products/:id` - Get product by ID
+- `POST /api/products` - Create product (Admin only)
+- `PUT /api/products/:id` - Update product (Admin only)
+- `DELETE /api/products/:id` - Delete product (Admin only)
 
+### Categories
 
-ex======================
+- `GET /api/categories` - Get all categories
+- `GET /api/categories/:id` - Get category by ID
+- `POST /api/categories` - Create category (Admin only)
+- `PUT /api/categories/:id` - Update category (Admin only)
+- `DELETE /api/categories/:id` - Delete category (Admin only)
+
+### Cart
+
+- `GET /api/cart` - Get user's cart
+- `POST /api/cart/add` - Add product to cart
+- `PUT /api/cart/update` - Update cart item quantity
+- `DELETE /api/cart/remove` - Remove product from cart
+- `DELETE /api/cart/clear` - Clear entire cart
+
+### Orders
+
+- `POST /api/orders` - Create new order
+- `GET /api/orders/user` - Get user's orders
+- `GET /api/orders/:id` - Get specific order
+- `GET /api/orders` - Get all orders (Admin only)
+- `PUT /api/orders/:id/status` - Update order status (Admin only)
+
+## Database Models
+
+### User
+
+```javascript
 {
-  "username": "ahmed123",
-  "email": "ahmed@example.com",
-  "password": "sddsdsdsd",
-  "role": "user",
+  name: String (required),
+  email: String (required, unique),
+  password: String (required, hashed),
+  role: String (enum: ["user", "admin"], default: "user"),
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }
+```
 
+### Product
 
-
-
-
-2️⃣ Collection: categories (التصنيفات)
-📌 كل منتج بينتمي إلى تصنيف معين مثل "هواتف"، "ملابس"، فهنخزن:
-
-name: اسم التصنيف
-createdAt: وقت الإضافة
-📍 الشكل النهائي في MongoDB:
-
-
+```javascript
 {
-  "name": "Electronics",
-  "description":"dsdsds"
+  title: String (required),
+  description: String (required),
+  price: Number (required),
+  category: ObjectId (ref: "Category", required),
+  stock: Number (required),
+  image: String (required)
 }
+```
 
+### Category
 
-
-
-3️⃣ Collection: products (المنتجات)
-📌 كل منتج بيكون له:
-
-name: اسم المنتج
-price: السعر
-category: معرف التصنيف (category_id)
-stock: الكمية المتاحة
-description: وصف المنتج
-images: صور المنتج
-createdAt: 
-وقت الإضافة
-
-
+```javascript
 {
-  "_id": "650ab5f2e23a5a7a4c8b4569",
-  "name": "iPhone 15",
-  "price": 1200,
-  "category": "650ab4e7e23a5a7a4c8b4568",
-  "stock": 50,
-  "description": "New iPhone with A16 Bionic chip.",
-  "images": [
-    "https://example.com/iphone1.jpg",
-    "https://example.com/iphone2.jpg"
-  ],
-  "createdAt": "2024-02-02T12:10:00Z"
+  title: String (required, unique),
+  description: String (optional)
 }
+```
 
+### Order
 
-
-
-
-
-
-
-
-
-
-4️⃣ Collection: orders (الطلبات)
-📌 كل طلب بيكون مرتبط بـ مستخدم معين (user_id) ومنتجات (product_id) وكمان هيكون عندك:
-
-user: معرف المستخدم اللي طلب المنتجات
-products: قائمة بالمنتجات المطلوبة وعددها
-totalPrice: إجمالي السعر
-status: حالة الطلب (Pending, Shipped, Delivered)
-createdAt: تاريخ الطلب
-
-
-
+```javascript
 {
-  "_id": "650ab6e4e23a5a7a4c8b4570",
-  "user": "650ab3f0e23a5a7a4c8b4567",
-  "products": [
-    {
-      "product": "650ab5f2e23a5a7a4c8b4569",
-      "quantity": 2
-    }
-  ],
-  "totalPrice": 2400,
-  "status": "Pending",
-  "createdAt": "2024-02-02T12:20:00Z"
+  user: ObjectId (ref: "User", required),
+  products: [{
+    product: ObjectId (ref: "Product", required),
+    quantity: Number (required, default: 1)
+  }],
+  totalAmount: Number (required),
+  status: String (enum: ["pending", "done"], default: "pending")
 }
+```
 
+### Cart
 
+```javascript
+{
+  user: ObjectId (ref: "User", required),
+  items: [{
+    product: ObjectId (ref: "Product", required),
+    quantity: Number (required, default: 1)
+  }]
+}
+```
 
+## Testing
 
+Run the API tests to verify all endpoints are working:
 
-📌 العلاقات بين الـ Collections
-📍 العلاقات بتكون كالتالي:
+```bash
+npm test
+```
 
-كل Product بينتمي إلى Category (category_id).
-كل Order مرتبط بـ User (user_id).
-كل Order يحتوي على منتجات متعددة (product_id مع quantity).
+This will test all major endpoints including:
 
+- User registration and authentication
+- Product and category management
+- Cart operations
+- Order creation and management
 
+## Error Handling
 
+The API includes comprehensive error handling:
 
+- Input validation
+- Authentication errors
+- Authorization errors
+- Database errors
+- Custom error messages
 
+## Security Features
 
+- Password hashing with bcryptjs
+- JWT token authentication
+- Role-based access control
+- Input validation and sanitization
+- CORS configuration
+- Environment variable protection
 
+## Contributing
 
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
+## License
 
+This project is licensed under the ISC License.
 
+## Support
 
+For support and questions, please open an issue in the repository.
 
+---
 
-
-
-
-
-
-
-db.users.insertOne({
-  "username": "ahmed123",
-  "email": "ahmed@example.com",
-  "password": "$2a$10$encryptedpassword",
-  "role": "user",
-  "createdAt": new Date()
-})
-
-db.categories.insertOne({
-  "name": "Electronics",
-  "createdAt": new Date()
-})
-
-db.products.insertOne({
-  "name": "iPhone 15",
-  "price": 1200,
-  "category": ObjectId("650ab4e7e23a5a7a4c8b4568"),
-  "stock": 50,
-  "description": "New iPhone with A16 Bionic chip.",
-  "images": ["https://example.com/iphone1.jpg"],
-  "createdAt": new Date()
-})
-
-db.orders.insertOne({
-  "user": ObjectId("650ab3f0e23a5a7a4c8b4567"),
-  "products": [
-    { "product": ObjectId("650ab5f2e23a5a7a4c8b4569"), "quantity": 2 }
-  ],
-  "totalPrice": 2400,
-  "status": "Pending",
-  "createdAt": new Date()
-})
-
-
-# EcommerceNodeJS
+**Note:** Make sure to update the environment variables with your actual values before running the application.
