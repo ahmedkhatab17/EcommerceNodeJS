@@ -11,6 +11,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add a root route for testing
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'E-commerce API is running! 🚀',
+    endpoints: {
+      products: '/api/products',
+      categories: '/api/categories',
+      auth: '/api/auth',
+      cart: '/api/cart',
+      orders: '/api/orders',
+      health: '/api/health'
+    }
+  });
+});
+
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
