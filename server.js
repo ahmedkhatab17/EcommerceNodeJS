@@ -8,7 +8,20 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:4200', // Development
+    'https://ecommerce-angular-tau-nine.vercel.app', // Production frontend
+    'https://ecommerce-angular.vercel.app' // Alternative production URL
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Add a root route for testing
@@ -80,6 +93,23 @@ app.get('/debug/routes', (req, res) => {
         methods: Object.keys(layer.route.methods)
       }))
   });
+});
+
+// Temporary seed route for testing (remove in production)
+app.get('/seed', async (req, res) => {
+  try {
+    const { exec } = require('child_process');
+    exec('node seed.js', (error, stdout, stderr) => {
+      if (error) {
+        console.error('Seed error:', error);
+        return res.status(500).json({ error: 'Seeding failed', details: error.message });
+      }
+      console.log('Seed output:', stdout);
+      res.json({ message: 'Database seeded successfully', output: stdout });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Seeding failed', details: error.message });
+  }
 });
 
 app.get('/health', (req, res) => {
